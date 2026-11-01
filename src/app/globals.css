@@ -1,0 +1,276 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/* Design tokens                                                        */
+/* Semantic colours are CSS variables so dark, light and print themes  */
+/* share every component without per-component overrides.              */
+/* ------------------------------------------------------------------ */
+
+/* Dark: warm graphite with a single "signal" colour. Risk colours are the
+   only other saturated hues, so colour on screen always means something. */
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d0e0c;
+  --bg-2: #121310;
+  --surface: #161714;
+  --surface-2: #1c1d19;
+  --elevated: #22231f;
+  --border: #2a2b26;
+  --border-strong: #3a3b34;
+  --fg: #eceae2;
+  --muted: #a9a79b;
+  --subtle: #7d7b71;
+  --accent: #d4ef4a;
+  --accent-2: #8aa9f5;
+  --on-accent: #12140a;
+  --ai: #c3b1ef;
+  --info: #8aa9f5;
+  --low: #5fcf8a;
+  --medium: #f0c04e;
+  --high: #f08a4b;
+  --critical: #ef5d5d;
+  --series-1: #c2dc3f;
+  --series-2: #f08a4b;
+  --grid: #24251f;
+  --glow: transparent;
+  --glow-ai: transparent;
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.025) inset;
+}
+
+/* Light: warm paper, ink text, olive signal colour. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f4f2ec;
+  --bg-2: #eeebe3;
+  --surface: #fbfaf6;
+  --surface-2: #f1eee7;
+  --elevated: #ffffff;
+  --border: #e0dcd1;
+  --border-strong: #cbc6b8;
+  --fg: #18180f;
+  --muted: #55534a;
+  --subtle: #78756a;
+  --accent: #4b6600;
+  --accent-2: #2f59c9;
+  --on-accent: #f6ffd9;
+  --ai: #6a4fc0;
+  --info: #2f59c9;
+  --low: #1d8048;
+  --medium: #a36800;
+  --high: #c24e18;
+  --critical: #c42b2b;
+  --series-1: #5c7d00;
+  --series-2: #c24e18;
+  --grid: #e6e2d8;
+  --glow: transparent;
+  --glow-ai: transparent;
+  --shadow: 0 1px 2px rgba(24, 24, 15, 0.05);
+}
+
+/* Tighter corners across the whole UI. */
+@theme {
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 5px;
+  --radius-xl: 7px;
+  --radius-2xl: 9px;
+  --radius-3xl: 12px;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-elevated: var(--elevated);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-on-accent: var(--on-accent);
+  --color-ai: var(--ai);
+  --color-info: var(--info);
+  --color-low: var(--low);
+  --color-medium: var(--medium);
+  --color-high: var(--high);
+  --color-critical: var(--critical);
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-family), var(--font-body), ui-sans-serif, sans-serif;
+  --font-mono: var(--font-mono-family), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --shadow-panel: var(--shadow);
+  --radius-panel: 8px;
+  --animate-fade-up: fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-scan: scan 2.4s ease-in-out infinite;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes scan {
+  0%,
+  100% {
+    transform: translateY(0%);
+    opacity: 0;
+  }
+  10%,
+  90% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(100%);
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+  dialog::backdrop {
+    background: rgba(2, 6, 16, 0.65);
+    backdrop-filter: blur(3px);
+  }
+}
+
+@layer components {
+  /* Flat page background (kept as a class so print can override it). */
+  .ambient {
+    background: var(--bg);
+  }
+  /* Fine dot matrix used as a quiet texture behind a few panels. */
+  .grid-lines {
+    background-image: radial-gradient(color-mix(in oklab, var(--border-strong) 70%, transparent) 1px, transparent 1.2px);
+    background-size: 14px 14px;
+  }
+  /* Small monospace label used above headings ("01 — Platform"). */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--subtle);
+  }
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface-2) 25%, var(--elevated) 50%, var(--surface-2) 75%);
+    background-size: 200% 100%;
+    animation: var(--animate-shimmer);
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+:root[data-reduced-motion="true"] *,
+:root[data-reduced-motion="true"] *::before,
+:root[data-reduced-motion="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Print — always light, hide app chrome, keep report sections intact  */
+/* ------------------------------------------------------------------ */
+@media print {
+  :root,
+  :root[data-theme="dark"],
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #ffffff;
+    --bg-2: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f6f8fb;
+    --elevated: #ffffff;
+    --border: #d9e0ea;
+    --border-strong: #c3ccd9;
+    --fg: #0b1220;
+    --muted: #3f4b62;
+    --subtle: #5d6a82;
+    --accent: #3f5700;
+    --accent-2: #1d4ed8;
+    --ai: #5b3fb0;
+    --low: #047857;
+    --medium: #b45309;
+    --high: #c2410c;
+    --critical: #b91c1c;
+    --glow: transparent;
+    --glow-ai: transparent;
+    --shadow: none;
+  }
+  @page {
+    margin: 14mm 12mm;
+  }
+  body {
+    background: #fff !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .print-avoid-break {
+    break-inside: avoid;
+  }
+  .ambient {
+    background: #fff !important;
+  }
+}
+
+.print-only {
+  display: none;
+}

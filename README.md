@@ -1,6 +1,6 @@
-# ThreatDetector AI – Digital Trust & Threat Detection Platform
+# Digital Threat Detector 
 
-ThreatDetector AI is a web-based platform designed to help users assess the safety and authenticity of digital content through four analysis modules.
+ Digital Threat Detector is a web-based platform designed to help users assess the safety and authenticity of digital content through four analysis modules.
 
 ### Key Features
 

@@ -1,101 +1,79 @@
-# ThreatDetector AI — Frontend
+# ThreatDetector AI – Digital Trust & Threat Detection Platform
 
-**AI-Powered Digital Trust & Threat Detection Platform** (final-year project).
+ThreatDetector AI is a web-based platform designed to help users assess the safety and authenticity of digital content through four analysis modules.
 
-ThreatDetector AI helps people assess potentially risky, misleading, manipulated or unsafe digital content across four modules, combined into a unified **Digital Trust Report**:
+### Key Features
 
-1. Scam & Suspicious URL Detection
-2. Claim Verification & Misinformation Evidence
-3. AI-Generated Image & Image Manipulation Assessment
-4. Video Deepfake Assessment
+- **URL Threat Detection:** Identifies suspicious URL patterns and potential scam indicators using rule-based checks.
+- **Claim Verification:** Evaluates claims based on specificity, context, and available verification resources.
+- **Image Analysis:** Examines image metadata, dimensions, file properties, and compression indicators.
+- **Video Deepfake Assessment:** Provides a framework for video analysis, including duration, resolution, and frame-sampling information.
+- **Unified Digital Trust Report:** Combines module results into an overall risk assessment with confidence scores, evidence, coverage, and limitations.
 
-Results always communicate **risk, confidence, evidence, coverage and limitations**, never a definitive "real/fake" or "true/false" verdict.
+### Tech Stack
 
-## Quick start
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS v4
+- Recharts
+- Framer Motion
+- Lucide Icons
 
-Requires Node.js 20.9+ (22.13+ recommended).
+### Getting Started
+
+**1. Clone the repository**
+
+```bash
+git clone <repository-url>
+cd threatdetector
+```
+
+**2. Install dependencies**
 
 ```bash
 npm install
-npm run dev          # http://localhost:3000
 ```
 
-Production build:
+**3. Start the development server**
 
 ```bash
-npm run build
-npm start
+npm run dev
 ```
 
-Checks:
+Open `http://localhost:3000` in your browser.
 
-```bash
-npm run lint
-npm run typecheck
-```
+### Implementation Status
 
-## Tech stack
+- URL analysis uses rule-based heuristics.
+- Claim analysis uses text-based checkability indicators.
+- Image analysis currently uses file and metadata properties.
+- Video analysis currently extracts basic video properties and prepares a frame-sampling plan.
+- Advanced image manipulation and deepfake detection are planned for backend integration.
 
-Next.js 16 (App Router) · React 19 · TypeScript (strict) · Tailwind CSS v4 · Recharts · Framer Motion · Lucide icons. No paid services, API keys or backend are required.
+The application currently runs in browser-based demo mode, with a proposed FastAPI integration for backend services.
 
-## Demo mode vs. API mode
+### Project Structure
 
-By default the app runs in **demo mode**. Everything happens in the browser, nothing is uploaded, and every output is labelled.
-
-| Module | What is real | What is demo/simulated |
-| --- | --- | --- |
-| Scam & URL | Transparent rule-based heuristics (urgency, credential/payment requests, impersonation, shorteners, punycode/Unicode lookalikes, risky TLDs, IP hosts…). | It is not an ML model. No live reputation, WHOIS or blocklist lookups. |
-| Claim | Checkability analysis (specificity, vague/opinion terms, dates, entities). Real search links in the verification steps. | No evidence retrieval. Bundled example claims use **illustrative** sources (fictional publishers, no links). Arbitrary claims return "Insufficient reliable evidence". |
-| Image | File type/size, dimensions, JPEG EXIF-block presence, compression and quality indicators. | Detector signals and the manipulation score (deterministic placeholders). |
-| Video | Duration, resolution, size, frame-sampling plan. | Face detection, per-frame scores, temporal consistency. A "demo scenario" control lets you show the completed, insufficient-coverage and failed states. |
-| Dashboard / History | Computed from stored records. | First launch seeds clearly-labelled **sample** reports (reset in Settings). |
-
-Data is stored in `localStorage` (`threatdetector.demo.v1`). Raw message text and uploaded media are **never** persisted. Previews live only in the current tab's memory.
-
-## Connecting the FastAPI backend
-
-1. Copy `.env.example` to `.env.local`:
-
-   ```env
-   NEXT_PUBLIC_THREATDETECTOR_MODE=api
-   NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
-   NEXT_PUBLIC_API_TIMEOUT_MS=20000
-   ```
-
-2. Implement the **proposed** endpoints (see `src/services/api/contracts.ts`):
-
-   | Method | Path | Body | Returns |
-   | --- | --- | --- | --- |
-   | POST | `/analyze/text` | `{ text, url? }` | `AnalysisResult` (module `scam`) |
-   | POST | `/analyze/url` | `{ url }` | `AnalysisResult` (module `scam`) |
-   | POST | `/verify/claim` | `{ claim, context? }` | `AnalysisResult` (module `claim`) |
-   | POST | `/analyze/image` | multipart `file` | `AnalysisResult` (module `image`) |
-   | POST | `/analyze/video` | multipart `file` | `AnalysisResult` (module `video`, status `queued`) |
-   | GET | `/analyze/video/{id}` | — | `AnalysisResult` (polling; additional proposal) |
-   | GET | `/reports` | — | `{ reports: ReportResponse[] }` |
-   | GET | `/reports/{id}` | — | `ReportResponse` |
-
-3. Enable CORS for the frontend origin in FastAPI (`CORSMiddleware`).
-
-The response shape is defined in `src/types/analysis.ts`. Key fields are `module`, `risk_score` (0–100, or `null` when no valid score was produced), `confidence` (0–1), `label`, `reasons`, `evidence`, `limitations`, `model_version`, `status`, `coverage`, timestamps and module `details`. Incoming JSON is validated and defaulted in `src/services/validation.ts`, which also accepts confidence on a 0–100 scale. If the backend is unreachable or times out, the app falls back to the demo engines and tells the user.
-
-Risk levels: **Low 0–29 · Medium 30–59 · High 60–79 · Critical 80–100**.
-
-## Project structure
-
-```
+```text
 src/
-  app/                 routes (landing, (app)/dashboard, analyze, results, reports, settings)
-  components/          ui primitives, layout shell, charts, risk visuals, result blocks
-  features/            landing, dashboard, analysis, scam, verification,
-                       image-analysis, video-analysis, reports, settings
-  lib/                 risk thresholds, unified scoring, formatting, media helpers
-  lib/demo/            labelled demo engines + sample seed data
-  services/            analysis-service (demo ⇄ API), api client/endpoints/contracts, validation
-  store/               local store (useSyncExternalStore + localStorage)
-  types/               shared data contract
+├── app/          # Application routes
+├── components/   # Reusable UI components
+├── features/     # Analysis modules
+├── lib/          # Utilities and scoring logic
+├── services/     # API integration and validation
+├── store/        # Local state management
+└── types/        # TypeScript definitions
 ```
 
-## Unified score
+### Future Scope
 
-`max(confidence-weighted mean of valid module scores, 0.85 × highest module score)`. Failed, insufficient-coverage, unscored and missing modules are excluded and listed. They are never treated as low risk. Overall confidence is reduced when fewer modules contribute.
+- Backend integration using FastAPI.
+- Advanced image manipulation detection.
+- Video deepfake detection.
+- Automated evidence retrieval for claim verification.
+- External URL reputation and threat intelligence integration.
+
+---
+
+**Project Type:** Final-Year B.Tech Project
